@@ -1,0 +1,668 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Host Portal | The STER Farmhouse</title>
+  <meta name="robots" content="noindex, nofollow">
+
+  <!-- Icons & Fonts -->
+  <link rel="icon" type="image/png" href="assets/favicon.png">
+  <link rel="apple-touch-icon" href="assets/apple-touch-icon.png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Spectral:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --forest-deep: #141A13;
+      --forest-main: #1C231B;
+      --forest-card: rgba(28, 35, 27, 0.95);
+      --gold-primary: #C2A35A;
+      --gold-light: #EBD9A6;
+      --gold-border: rgba(194, 163, 90, 0.28);
+      --text-white: #F8F5EE;
+      --text-muted: rgba(248, 245, 238, 0.72);
+      --red-booked: #B83A3A;
+      --red-booked-bg: rgba(184, 58, 58, 0.18);
+      --green-avail: #2E7D32;
+      --green-avail-bg: rgba(46, 125, 50, 0.16);
+      --font-serif: 'Spectral', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background: var(--forest-deep);
+      color: var(--text-white);
+      font-family: var(--font-serif);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* NAV */
+    .admin-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px clamp(16px, 4vw, 48px);
+      background: rgba(20, 26, 19, 0.95);
+      border-bottom: 1px solid var(--gold-border);
+      backdrop-filter: blur(10px);
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .brand-icon {
+      width: 36px;
+      height: 36px;
+      border-radius: 6px;
+      border: 1px solid var(--gold-primary);
+      object-fit: cover;
+    }
+
+    .brand-title {
+      font-size: 17px;
+      letter-spacing: 0.14em;
+    }
+
+    .brand-sub {
+      font-family: var(--font-mono);
+      font-size: 10px;
+      letter-spacing: 0.2em;
+      color: var(--gold-primary);
+      text-transform: uppercase;
+    }
+
+    .btn-view-site {
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.12em;
+      color: var(--gold-light);
+      text-decoration: none;
+      border: 1px solid var(--gold-border);
+      padding: 8px 14px;
+      border-radius: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-view-site:hover {
+      border-color: var(--gold-primary);
+      color: var(--text-white);
+    }
+
+    /* CONTAINER */
+    .admin-container {
+      max-width: 880px;
+      margin: 0 auto;
+      width: 100%;
+      padding: clamp(24px, 4vw, 48px) 16px;
+      flex: 1;
+    }
+
+    /* PIN LOCK MODAL */
+    .pin-card {
+      max-width: 400px;
+      margin: 40px auto;
+      background: var(--forest-card);
+      border: 1px solid var(--gold-border);
+      border-radius: 8px;
+      padding: 32px 24px;
+      text-align: center;
+      box-shadow: 0 20px 48px rgba(0,0,0,0.6);
+    }
+
+    .pin-title {
+      font-size: 22px;
+      margin-bottom: 8px;
+      font-weight: 400;
+    }
+
+    .pin-desc {
+      font-size: 13.5px;
+      color: var(--text-muted);
+      line-height: 1.5;
+      margin-bottom: 24px;
+    }
+
+    .pin-input {
+      width: 100%;
+      text-align: center;
+      letter-spacing: 0.4em;
+      font-size: 24px;
+      padding: 12px;
+      background: rgba(14, 18, 13, 0.9);
+      border: 1px solid var(--gold-primary);
+      border-radius: 6px;
+      color: var(--gold-light);
+      font-family: var(--font-mono);
+      outline: none;
+      margin-bottom: 18px;
+    }
+
+    .btn-unlock {
+      width: 100%;
+      background: var(--gold-primary);
+      color: var(--forest-deep);
+      font-family: var(--font-mono);
+      font-size: 12px;
+      font-weight: 500;
+      letter-spacing: 0.16em;
+      text-transform: uppercase;
+      padding: 14px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      transition: background 0.2s ease;
+    }
+
+    .btn-unlock:hover { background: var(--gold-light); }
+
+    /* DASHBOARD */
+    #dashboardArea { display: none; }
+
+    .dash-header {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 16px;
+      margin-bottom: 24px;
+      padding-bottom: 20px;
+      border-bottom: 1px solid var(--gold-border);
+    }
+
+    .dash-title {
+      font-size: clamp(22px, 3vw, 28px);
+      font-weight: 300;
+    }
+
+    .dash-actions {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .btn-save {
+      background: #25D366;
+      color: #0E2715;
+      font-family: var(--font-mono);
+      font-size: 11.5px;
+      font-weight: 500;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      padding: 11px 22px;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+    }
+
+    .btn-save:hover { background: #20BA5A; transform: translateY(-1px); }
+
+    .status-toast {
+      font-family: var(--font-mono);
+      font-size: 12px;
+      color: var(--gold-light);
+      display: none;
+    }
+
+    /* INSTRUCTIONS & LEGEND */
+    .guide-strip {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid rgba(248, 245, 238, 0.1);
+      border-radius: 6px;
+      padding: 14px 18px;
+      margin-bottom: 24px;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 14px;
+      font-size: 13.5px;
+    }
+
+    .legend-wrap {
+      display: flex;
+      align-items: center;
+      gap: 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.08em;
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 3px;
+      display: inline-block;
+      vertical-align: middle;
+      margin-right: 4px;
+    }
+
+    /* CALENDAR CARD */
+    .cal-card {
+      background: var(--forest-card);
+      border: 1px solid var(--gold-border);
+      border-radius: 8px;
+      padding: 24px;
+      box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+    }
+
+    .cal-nav {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 20px;
+    }
+
+    .month-heading {
+      font-family: var(--font-serif);
+      font-size: 22px;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+    }
+
+    .cal-btn {
+      background: transparent;
+      border: 1px solid var(--gold-border);
+      color: var(--text-white);
+      font-size: 22px;
+      line-height: 1;
+      width: 38px;
+      height: 38px;
+      border-radius: 4px;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+    }
+
+    .cal-btn:hover { border-color: var(--gold-primary); color: var(--gold-primary); }
+
+    .weekdays-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: var(--gold-light);
+      margin-bottom: 10px;
+      padding-bottom: 8px;
+      border-bottom: 1px solid rgba(248, 245, 238, 0.08);
+    }
+
+    .days-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 6px;
+    }
+
+    .day-cell {
+      aspect-ratio: 1;
+      border-radius: 6px;
+      border: 1px solid rgba(248, 245, 238, 0.12);
+      background: rgba(22, 28, 21, 0.7);
+      color: var(--text-white);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      font-family: var(--font-mono);
+      font-size: 14px;
+      font-weight: 500;
+      position: relative;
+      transition: all 0.15s ease;
+      user-select: none;
+      padding: 4px;
+    }
+
+    .day-cell:hover:not(.empty) {
+      border-color: var(--gold-primary);
+      transform: scale(1.04);
+    }
+
+    .day-cell.empty {
+      background: transparent;
+      border-color: transparent;
+      cursor: default;
+    }
+
+    .day-cell.booked {
+      background: var(--red-booked-bg) !important;
+      border-color: var(--red-booked) !important;
+      color: #FF8B8B !important;
+    }
+
+    .day-cell.booked::after {
+      content: 'BOOKED';
+      font-size: 8.5px;
+      letter-spacing: 0.1em;
+      color: #FFA5A5;
+      font-weight: 500;
+      margin-top: 2px;
+    }
+
+    .day-cell.available::after {
+      content: 'OPEN';
+      font-size: 8.5px;
+      letter-spacing: 0.1em;
+      color: #81C784;
+      margin-top: 2px;
+      opacity: 0.8;
+    }
+
+    .day-cell.past {
+      opacity: 0.25;
+      cursor: not-allowed;
+    }
+
+    /* FOOTER */
+    .admin-footer {
+      text-align: center;
+      padding: 24px 16px;
+      font-family: var(--font-mono);
+      font-size: 11px;
+      letter-spacing: 0.1em;
+      color: rgba(248, 245, 238, 0.4);
+      border-top: 1px solid var(--gold-border);
+    }
+
+    @media (max-width: 640px) {
+      .day-cell { font-size: 12px; }
+      .day-cell.booked::after, .day-cell.available::after { font-size: 7.5px; }
+      .days-grid { gap: 4px; }
+      .cal-card { padding: 16px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <header class="admin-nav">
+    <div class="brand-wrap">
+      <img src="assets/house-icon.png" alt="Icon" class="brand-icon">
+      <div>
+        <div class="brand-title">THE STER FARMHOUSE</div>
+        <div class="brand-sub">CALENDAR MANAGER</div>
+      </div>
+    </div>
+
+    <a href="index.html" class="btn-view-site">&larr; View Live Website</a>
+  </header>
+
+  <main class="admin-container">
+    <!-- PIN ENTRY SCREEN -->
+    <div id="pinScreen" class="pin-card">
+      <h1 class="pin-title">Host Security PIN</h1>
+      <p class="pin-desc">
+        Enter your 4-digit host PIN to manage booked dates.<br>
+        <span style="font-size: 12px; color: var(--gold-light);">Default PIN: <strong>2540</strong></span>
+      </p>
+      <form id="pinForm">
+        <input type="password" id="pinInput" class="pin-input" maxlength="6" placeholder="&bull;&bull;&bull;&bull;" autofocus required>
+        <button type="submit" class="btn-unlock">Unlock Calendar</button>
+      </form>
+    </div>
+
+    <!-- MAIN DASHBOARD -->
+    <div id="dashboardArea">
+      <div class="dash-header">
+        <div>
+          <h2 class="dash-title">Booking Availability</h2>
+          <p style="font-size: 13.5px; color: var(--text-muted); margin-top: 4px;">
+            Tap any date to mark it as <strong style="color: #FF8B8B;">BOOKED</strong> or <strong style="color: #81C784;">OPEN</strong>.
+          </p>
+        </div>
+
+        <div class="dash-actions">
+          <span id="saveStatus" class="status-toast">All changes saved!</span>
+          <button type="button" id="saveBtn" class="btn-save">
+            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            Save &amp; Publish
+          </button>
+        </div>
+      </div>
+
+      <div class="guide-strip">
+        <div class="legend-wrap">
+          <div><span class="legend-dot" style="background:#2E7D32;"></span> Open Date</div>
+          <div><span class="legend-dot" style="background:#B83A3A;"></span> Booked (Blocked on site)</div>
+        </div>
+        <div style="font-family: var(--font-mono); font-size: 11px; color: var(--gold-light);">
+          Total Booked: <strong id="totalBookedCount">0</strong> nights
+        </div>
+      </div>
+
+      <div class="cal-card">
+        <div class="cal-nav">
+          <button type="button" id="prevMonthBtn" class="cal-btn">&#8249;</button>
+          <div id="monthLabel" class="month-heading">September 2026</div>
+          <button type="button" id="nextMonthBtn" class="cal-btn">&#8250;</button>
+        </div>
+
+        <div class="weekdays-grid">
+          <span>SUN</span><span>MON</span><span>TUE</span><span>WED</span><span>THU</span><span>FRI</span><span>SAT</span>
+        </div>
+
+        <div id="daysGrid" class="days-grid">
+          <!-- Calendar days rendered here -->
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <footer class="admin-footer">
+    The STER Farmhouse &bull; Direct Host Management Portal
+  </footer>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      let currentPin = sessionStorage.getItem('ster_host_pin') || '';
+      let bookedDates = new Set();
+      let viewDate = new Date();
+      viewDate.setDate(1);
+
+      const pinScreen = document.getElementById('pinScreen');
+      const dashboardArea = document.getElementById('dashboardArea');
+      const pinForm = document.getElementById('pinForm');
+      const pinInput = document.getElementById('pinInput');
+      const monthLabel = document.getElementById('monthLabel');
+      const daysGrid = document.getElementById('daysGrid');
+      const totalBookedCount = document.getElementById('totalBookedCount');
+      const saveBtn = document.getElementById('saveBtn');
+      const saveStatus = document.getElementById('saveStatus');
+
+      // Fetch booked dates from backend
+      const loadBookedDates = async () => {
+        try {
+          const res = await fetch('/api/bookings');
+          if (res.ok) {
+            const data = await res.json();
+            if (Array.isArray(data.dates)) {
+              bookedDates = new Set(data.dates);
+              renderCalendar();
+              return;
+            }
+          }
+          // Fallback to local data/booked-dates.json
+          const fallbackRes = await fetch('data/booked-dates.json');
+          if (fallbackRes.ok) {
+            const dates = await fallbackRes.json();
+            bookedDates = new Set(dates);
+          }
+        } catch (e) {
+          console.log('Error loading dates, using empty set', e);
+        }
+        renderCalendar();
+      };
+
+      // PIN Submit
+      pinForm.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const entered = pinInput.value.trim();
+        // Check PIN (default 2540 or configured)
+        currentPin = entered;
+        sessionStorage.setItem('ster_host_pin', currentPin);
+        unlockDashboard();
+      });
+
+      const unlockDashboard = () => {
+        pinScreen.style.display = 'none';
+        dashboardArea.style.display = 'block';
+        loadBookedDates();
+      };
+
+      
+      const lockBtn = document.getElementById('lockBtn');
+      if (lockBtn) {
+        lockBtn.addEventListener('click', () => {
+          sessionStorage.removeItem('ster_host_pin');
+          currentPin = '';
+          dashboardArea.style.display = 'none';
+          pinScreen.style.display = 'block';
+          lockBtn.style.display = 'none';
+          pinInput.value = '';
+          pinInput.focus();
+        });
+      }
+
+      const unlockDashboardOriginal = unlockDashboard;
+      unlockDashboard = () => {
+        unlockDashboardOriginal();
+        if (lockBtn) lockBtn.style.display = 'inline-block';
+      };
+    
+      if (currentPin) {
+        unlockDashboard();
+      }
+
+      // Render Calendar Days
+      const renderCalendar = () => {
+        const year = viewDate.getFullYear();
+        const month = viewDate.getMonth();
+
+        monthLabel.textContent = viewDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+        totalBookedCount.textContent = bookedDates.size;
+
+        daysGrid.innerHTML = '';
+
+        const firstDayIndex = new Date(year, month, 1).getDay();
+        const totalDays = new Date(year, month + 1, 0).getDate();
+
+        // Empty cells before month start
+        for (let i = 0; i < firstDayIndex; i++) {
+          const empty = document.createElement('div');
+          empty.className = 'day-cell empty';
+          daysGrid.appendChild(empty);
+        }
+
+        const today = new Date();
+        today.setHours(0,0,0,0);
+
+        for (let day = 1; day <= totalDays; day++) {
+          const dateObj = new Date(year, month, day);
+          const dateISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+          
+          const cell = document.createElement('button');
+          cell.type = 'button';
+          cell.className = 'day-cell';
+          cell.textContent = day;
+
+          if (dateObj < today) {
+            cell.classList.add('past');
+          } else {
+            if (bookedDates.has(dateISO)) {
+              cell.classList.add('booked');
+            } else {
+              cell.classList.add('available');
+            }
+
+            // Click to toggle
+            cell.addEventListener('click', () => {
+              if (bookedDates.has(dateISO)) {
+                bookedDates.delete(dateISO);
+                cell.classList.remove('booked');
+                cell.classList.add('available');
+              } else {
+                bookedDates.add(dateISO);
+                cell.classList.remove('available');
+                cell.classList.add('booked');
+              }
+              totalBookedCount.textContent = bookedDates.size;
+              // Trigger autosave feedback
+              saveBtn.style.background = '#C2A35A';
+              saveBtn.innerHTML = 'Save Changes';
+            });
+          }
+
+          daysGrid.appendChild(cell);
+        }
+      };
+
+      // Month Navigation
+      document.getElementById('prevMonthBtn').addEventListener('click', () => {
+        viewDate.setMonth(viewDate.getMonth() - 1);
+        renderCalendar();
+      });
+
+      document.getElementById('nextMonthBtn').addEventListener('click', () => {
+        viewDate.setMonth(viewDate.getMonth() + 1);
+        renderCalendar();
+      });
+
+      // Save to Backend
+      saveBtn.addEventListener('click', async () => {
+        saveBtn.disabled = true;
+        saveBtn.textContent = 'Saving...';
+        
+        try {
+          const res = await fetch('/api/bookings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-admin-pin': currentPin
+            },
+            body: JSON.stringify({
+              pin: currentPin,
+              dates: Array.from(bookedDates)
+            })
+          });
+
+          const data = await res.json();
+          if (res.ok && data.success) {
+            saveStatus.textContent = '✓ Published Live!';
+            saveStatus.style.display = 'inline-block';
+            saveBtn.style.background = '#25D366';
+            saveBtn.innerHTML = '✓ Saved';
+            setTimeout(() => {
+              saveStatus.style.display = 'none';
+              saveBtn.disabled = false;
+              saveBtn.innerHTML = 'Save &amp; Publish';
+            }, 3000);
+          } else {
+            alert('Save failed: ' + (data.error || 'Please check your PIN'));
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = 'Retry Save';
+          }
+        } catch (err) {
+          alert('Network error while saving. Please check your connection.');
+          saveBtn.disabled = false;
+          saveBtn.innerHTML = 'Retry Save';
+        }
+      });
+    });
+  </script>
+</body>
+</html>

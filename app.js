@@ -89,6 +89,56 @@ document.addEventListener('DOMContentLoaded', () => {
   const addonAvocadoLabel = document.getElementById('addonAvocadoLabel');
   const addonAvocadoVal = document.getElementById('addonAvocadoVal');
 
+  
+  // ================== BOOKED DATES & CALENDAR SYNC ==================
+  let globalBookedDates = new Set();
+  const bookedWarningBox = document.getElementById('bookedWarningBox');
+  const bookedWarningText = document.getElementById('bookedWarningText');
+
+  const checkDateConflicts = (inDate, outDate) => {
+    if (!globalBookedDates || globalBookedDates.size === 0) return [];
+    const conflicts = [];
+    const curr = new Date(inDate);
+    curr.setHours(0,0,0,0);
+    const end = new Date(outDate);
+    end.setHours(0,0,0,0);
+
+    while (curr < end) {
+      const iso = formatDateISO(curr);
+      if (globalBookedDates.has(iso)) {
+        conflicts.push(iso);
+      }
+      curr.setDate(curr.getDate() + 1);
+    }
+    return conflicts;
+  };
+
+  const fetchBookedDates = async () => {
+    try {
+      // 1. Try Vercel Serverless Function
+      const res = await fetch('/api/bookings');
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data.dates)) {
+          globalBookedDates = new Set(data.dates);
+          updateCalculations();
+          return;
+        }
+      }
+      // 2. Fallback to static data/booked-dates.json
+      const staticRes = await fetch('data/booked-dates.json');
+      if (staticRes.ok) {
+        const dates = await staticRes.json();
+        if (Array.isArray(dates)) {
+          globalBookedDates = new Set(dates);
+          updateCalculations();
+        }
+      }
+    } catch (err) {
+      console.log('Booked dates sync notice:', err);
+    }
+  };
+
   const updateCalculations = () => {
     const diffTime = checkOutDate.getTime() - checkInDate.getTime();
     let nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -120,6 +170,25 @@ document.addEventListener('DOMContentLoaded', () => {
 
     const grandTotal = baseStayTotal + chefTotal + avocadoTotal;
     const deposit = Math.round(grandTotal * 0.5);
+    // Check for booked date conflicts
+    const conflicts = checkDateConflicts(checkInDate, checkOutDate);
+    const hasConflicts = conflicts.length > 0;
+    if (bookedWarningBox) {
+      if (hasConflicts) {
+        bookedWarningBox.style.display = 'block';
+        if (bookedWarningText) {
+          const readableConflicts = conflicts.map(d => {
+            const parts = d.split('-');
+            const dt = new Date(parseInt(parts[0]), parseInt(parts[1])-1, parseInt(parts[2]));
+            return formatDateLabel(dt);
+          }).join(', ');
+          bookedWarningText.innerHTML = `The following night(s) are already reserved: <strong>${readableConflicts}</strong>. Please adjust your check-in/check-out dates.`;
+        }
+      } else {
+        bookedWarningBox.style.display = 'none';
+      }
+    }
+
 
     // Update labels
     if (checkInHeroLabel) checkInHeroLabel.textContent = formatDateLabel(checkInDate);
@@ -154,7 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
 - Guests: ${guestsCount} guests
 - Accommodation: Entire Home (KES ${baseStayTotal.toLocaleString()})${addonsText}
 - Estimated Total: KES ${grandTotal.toLocaleString()} (50% deposit: KES ${deposit.toLocaleString()})
-${notes ? notes + '\n' : ''}Please confirm date availability!`;
+${notes ? notes + '\n' : ''}${hasConflicts ? "[NOTE: Requested dates include nights marked reserved (" + conflicts.join(", ") + "), inquiring for availability/waitlist]\n" : ""}Please confirm date availability!`;
 
     const encodedMsg = encodeURIComponent(message);
     if (whatsappBookBtn) {
@@ -218,8 +287,9 @@ ${notes ? notes + '\n' : ''}Please confirm date availability!`;
   if (guestNameInput) guestNameInput.addEventListener('input', updateCalculations);
   if (specialReqInput) specialReqInput.addEventListener('input', updateCalculations);
 
-  // Initial calculation
+  // Initial calculation & fetch booked dates
   updateCalculations();
+  fetchBookedDates();
 
   // ================== 7. LIVE THARAKA NITHI WEATHER ==================
   const fetchLiveWeather = async () => {
