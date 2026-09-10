@@ -175,6 +175,117 @@ ${notes ? notes + '\n' : ''}Please confirm date availability!`;
   // Initial calculation
   updateCalculations();
 
+  // ================== 7. LIVE THARAKA NITHI WEATHER ==================
+  const fetchLiveWeather = async () => {
+    try {
+      // Chuka / Tharaka Nithi Coordinates: lat -0.33, lon 37.65
+      const res = await fetch('https://api.open-meteo.com/v1/forecast?latitude=-0.33&longitude=37.65&current=temperature_2m,weather_code');
+      if (!res.ok) return;
+      const data = await res.json();
+      
+      const temp = Math.round(data.current.temperature_2m);
+      const code = data.current.weather_code;
+      
+      // Determine condition description
+      const now = new Date();
+      const hour = now.getHours();
+      const isEvening = hour >= 17 || hour <= 6;
+      
+      let condition = isEvening ? 'CRISP HIGHLAND NIGHT' : 'CRISP HIGHLAND AIR';
+      if (code === 0) condition = isEvening ? 'CLEAR STARRY NIGHT' : 'SUNNY HIGHLAND SKIES';
+      else if (code >= 1 && code <= 3) condition = isEvening ? 'CRISP HIGHLAND EVENING' : 'PLEASANT & PARTLY CLOUDY';
+      else if (code >= 51 && code <= 67) condition = 'FRESH MOUNTAIN RAIN';
+      else if (code >= 80 && code <= 82) condition = 'COOL HIGHLAND SHOWERS';
+
+      const tempVal = document.getElementById('tempVal');
+      const condVal = document.getElementById('condVal');
+      if (tempVal) tempVal.innerHTML = `${temp}&deg;C`;
+      if (condVal) condVal.textContent = condition;
+    } catch (err) {
+      console.log('Using default highland climate values', err);
+    }
+  };
+  fetchLiveWeather();
+
+  // ================== 8. FULL-SCREEN LIGHTBOX GALLERY ==================
+  const lightboxModal = document.getElementById('lightboxModal');
+  const lightboxImg = document.getElementById('lightboxImg');
+  const lightboxCaption = document.getElementById('lightboxCaption');
+  const lightboxCounter = document.getElementById('lightboxCounter');
+  const lightboxCloseBtn = document.getElementById('lightboxCloseBtn');
+  const lightboxPrevBtn = document.getElementById('lightboxPrevBtn');
+  const lightboxNextBtn = document.getElementById('lightboxNextBtn');
+
+  // Collect all gallery photos
+  const galleryImgs = Array.from(document.querySelectorAll('.img-frame img, .room-img, .excursion-img-wrap img'));
+  let currentIndex = 0;
+
+  const openLightbox = (index) => {
+    currentIndex = index;
+    const target = galleryImgs[currentIndex];
+    if (!target) return;
+
+    lightboxImg.src = target.src;
+    lightboxCaption.textContent = target.alt || 'The STER Farmhouse';
+    lightboxCounter.textContent = `${currentIndex + 1} / ${galleryImgs.length}`;
+    
+    lightboxModal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  };
+
+  const closeLightbox = () => {
+    lightboxModal.classList.remove('active');
+    document.body.style.overflow = '';
+  };
+
+  const showPrev = () => {
+    currentIndex = (currentIndex - 1 + galleryImgs.length) % galleryImgs.length;
+    openLightbox(currentIndex);
+  };
+
+  const showNext = () => {
+    currentIndex = (currentIndex + 1) % galleryImgs.length;
+    openLightbox(currentIndex);
+  };
+
+  galleryImgs.forEach((img, i) => {
+    img.addEventListener('click', () => openLightbox(i));
+  });
+
+  if (lightboxCloseBtn) lightboxCloseBtn.addEventListener('click', closeLightbox);
+  if (lightboxPrevBtn) lightboxPrevBtn.addEventListener('click', (e) => { e.stopPropagation(); showPrev(); });
+  if (lightboxNextBtn) lightboxNextBtn.addEventListener('click', (e) => { e.stopPropagation(); showNext(); });
+  
+  if (lightboxModal) {
+    lightboxModal.addEventListener('click', (e) => {
+      if (e.target === lightboxModal) closeLightbox();
+    });
+  }
+
+  // Keyboard controls
+  document.addEventListener('keydown', (e) => {
+    if (!lightboxModal || !lightboxModal.classList.contains('active')) return;
+    if (e.key === 'Escape') closeLightbox();
+    if (e.key === 'ArrowLeft') showPrev();
+    if (e.key === 'ArrowRight') showNext();
+  });
+
+  // Touch Swipe for Mobile
+  let touchStartX = 0;
+  let touchEndX = 0;
+  if (lightboxModal) {
+    lightboxModal.addEventListener('touchstart', (e) => {
+      touchStartX = e.changedTouches[0].screenX;
+    }, { passive: true });
+
+    lightboxModal.addEventListener('touchend', (e) => {
+      touchEndX = e.changedTouches[0].screenX;
+      if (touchStartX - touchEndX > 50) showNext(); // Swipe left
+      if (touchEndX - touchStartX > 50) showPrev(); // Swipe right
+    }, { passive: true });
+  }
+
+
   // 6. Smooth scroll for anchor tags
   document.querySelectorAll('a[href^="#"]').forEach(anchor => {
     anchor.addEventListener('click', function (e) {

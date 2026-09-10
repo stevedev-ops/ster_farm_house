@@ -119,13 +119,19 @@
   <!-- ================== HERO ================== -->
   <header class="hero-header">
     <div class="hero-media-wrapper">
-      <img src="assets/outside-grounds.jpg" alt="The STER Farmhouse grounds and lush highland gardens" class="hero-image">
+      <img src="assets/outside-grounds.webp" alt="The STER Farmhouse grounds and lush highland gardens" class="hero-image">
       <div class="hero-overlay"></div>
       <div class="hero-vignette"></div>
     </div>
 
     <div class="hero-content">
-      <span class="eyebrow">THARAKA NITHI · MT. KENYA FOOTHILLS</span>
+      <div class="weather-badge-wrap">
+        <span class="eyebrow" style="margin-bottom: 8px;">THARAKA NITHI &bull; MT. KENYA FOOTHILLS</span>
+        <div id="weatherBadge" class="weather-badge" title="Live Tharaka Nithi weather">
+          <span class="weather-pulse"></span>
+          <span id="weatherText">HIGHLANDS &bull; ELEVATION 1,450M &bull; <span id="tempVal">22&deg;C</span> <span id="condVal">CRISP AIR</span></span>
+        </div>
+      </div>
       <h1 class="hero-title">Country Retreat in the Highland Tea Farms</h1>
       <div class="gold-divider"></div>
       <p class="hero-desc">
@@ -211,7 +217,7 @@
       <!-- Feature Duo 1: Living & Fireplace -->
       <div class="visual-duo" data-reveal>
         <div class="img-frame">
-          <img src="assets/living-room-main.jpg" alt="Warm, spacious living room with cozy sofas and natural lighting">
+          <img loading="lazy" src="assets/living-room-main.webp" alt="Warm, spacious living room with cozy sofas and natural lighting">
         </div>
         <div>
           <span class="feature-tag">THE LOUNGE</span>
@@ -222,7 +228,7 @@
             the home with mountain sunshine. When the cool highland evening rolls in, gather inside for lively conversation and board games.
           </p>
           <div class="img-frame" style="max-height: 240px;">
-            <img src="assets/living-room-cozy.jpg" alt="Cozy lounge corner of The STER Farmhouse">
+            <img loading="lazy" src="assets/living-room-cozy.webp" alt="Cozy lounge corner of The STER Farmhouse">
           </div>
         </div>
       </div>
@@ -230,7 +236,7 @@
       <!-- Feature Duo 2: Chill Zone & Scenic Window -->
       <div class="visual-duo reverse" data-reveal>
         <div class="img-frame">
-          <img src="assets/scenic-window.jpg" alt="Panoramic view window overlooking green tea country">
+          <img loading="lazy" src="assets/scenic-window.webp" alt="Panoramic view window overlooking green tea country">
         </div>
         <div>
           <span class="feature-tag">PANORAMIC VIEWS</span>
@@ -241,7 +247,7 @@
             Enjoy your morning cup of fresh Kenyan highland tea while watching mist lift off the green tea farms.
           </p>
           <div class="img-frame" style="max-height: 240px;">
-            <img src="assets/chill-zone.jpg" alt="Dedicated chillout lounge with plush day seating">
+            <img loading="lazy" src="assets/chill-zone.webp" alt="Dedicated chillout lounge with plush day seating">
           </div>
         </div>
       </div>
@@ -249,7 +255,7 @@
       <!-- Feature Duo 3: Conclave Room & Dining -->
       <div class="visual-duo" data-reveal>
         <div class="img-frame">
-          <img src="assets/conclave-room.jpg" alt="The Conclave Room banquet table overlooking the backyard garden">
+          <img loading="lazy" src="assets/conclave-room.webp" alt="The Conclave Room banquet table overlooking the backyard garden">
         </div>
         <div>
           <span class="feature-tag">GATHERINGS &amp; CELEBRATIONS</span>
@@ -265,7 +271,7 @@
       <!-- Feature Duo 4: Kitchen -->
       <div class="visual-duo reverse" data-reveal>
         <div class="img-frame">
-          <img src="assets/kitchen-main.jpg" alt="Modern self-catering kitchen with cookware and appliances">
+          <img loading="lazy" src="assets/kitchen-main.webp" alt="Modern self-catering kitchen with cookware and appliances">
         </div>
         <div>
           <span class="feature-tag">CULINARY FREEDOM</span>
@@ -356,14 +362,14 @@
         </div>
 
         <div class="img-frame">
-          <img src="assets/tea-hills.png" alt="Tea farmers harvesting fresh tea in the rolling hills of Tharaka Nithi">
+          <img loading="lazy" src="assets/tea-hills.webp" alt="Tea farmers harvesting fresh tea in the rolling hills of Tharaka Nithi">
         </div>
       </div>
 
       <!-- Feature Highlight: STER Integrated Hass Avocado Farm -->
       <div class="visual-duo reverse" style="margin-top: 48px; margin-bottom: 0;" data-reveal>
         <div class="img-frame">
-          <img src="assets/hass-avocado-farm.jpg" alt="STER Integrated Hass Avocado and Banana Farm in the highlands of Tharaka Nithi">
+          <img loading="lazy" src="assets/hass-avocado-farm.webp" alt="STER Integrated Hass Avocado and Banana Farm in the highlands of Tharaka Nithi">
         </div>
 
         <div>
@@ -407,7 +413,7 @@
       <div class="rooms-grid" data-reveal>
         <!-- Room 2 -->
         <div class="room-card">
-          <img src="assets/bedroom-twin.jpg" alt="Twin bedroom with two beds for friends or siblings" class="room-img">
+          <img loading="lazy" src="assets/bedroom-twin.webp" alt="Twin bedroom with two beds for friends or siblings" class="room-img">
           <div class="room-info">
             <h3 class="room-title">The Twin Room</h3>
             <p class="room-desc">Two comfortable single beds designed for children, family, or travel companions looking for restful quietude.</p>
@@ -417,7 +423,7 @@
 
         <!-- Room 3 -->
         <div class="room-card">
-          <img src="assets/bedroom-window-view.jpg" alt="Guest room framing scenic green tea fields" class="room-img">
+          <img loading="lazy" src="assets/bedroom-window-view.webp" alt="Guest room framing scenic green tea fields" class="room-img">
           <div class="room-info">
             <h3 class="room-title">The Tea View Room</h3>
             <p class="room-desc">Awaken to golden morning sunshine streaming over the tea plantations through expansive glass picture windows.</p>
@@ -429,10 +435,10 @@
       <!-- Bathrooms Feature Banner -->
       <div style="margin-top: 48px; display: grid; grid-template-columns: 1fr 1fr; gap: 24px;" data-reveal>
         <div class="img-frame">
-          <img src="assets/bathroom-main.jpg" alt="Clean modern bathroom vanity and mirrors">
+          <img loading="lazy" src="assets/bathroom-main.webp" alt="Clean modern bathroom vanity and mirrors">
         </div>
         <div class="img-frame">
-          <img src="assets/bathroom-shower.jpg" alt="Spacious walk-in hot shower with glass partitioning">
+          <img loading="lazy" src="assets/bathroom-shower.webp" alt="Spacious walk-in hot shower with glass partitioning">
         </div>
       </div>
     </div>
@@ -455,7 +461,7 @@
         <!-- Gem: STER Integrated Hass Avocado Farm -->
         <div class="excursion-card">
           <div class="excursion-img-wrap">
-            <img src="assets/hass-avocado-farm.jpg" alt="Lush Hass avocado and banana trees on rolling highland hills">
+            <img loading="lazy" src="assets/hass-avocado-farm.webp" alt="Lush Hass avocado and banana trees on rolling highland hills">
             <span class="excursion-tag">30 MINS DRIVE</span>
           </div>
           <div class="excursion-body">
@@ -473,7 +479,7 @@
         <!-- Gem 1: Ngoko Waterfall -->
         <div class="excursion-card">
           <div class="excursion-img-wrap">
-            <img src="assets/ngoko-waterfall.jpg" alt="Aerial view of Ngoko Waterfall cascading into a circular mountain plunge pool">
+            <img loading="lazy" src="assets/ngoko-waterfall.webp" alt="Aerial view of Ngoko Waterfall cascading into a circular mountain plunge pool">
             <span class="excursion-tag">20 MINS DRIVE</span>
           </div>
           <div class="excursion-body">
@@ -491,7 +497,7 @@
         <!-- Gem 2: Mutunguruni Tall Tree -->
         <div class="excursion-card">
           <div class="excursion-img-wrap">
-            <img src="assets/mutunguruni-tree.png" alt="The massive buttress trunk of the Mutunguruni Tree in Tharaka Nithi">
+            <img loading="lazy" src="assets/mutunguruni-tree.webp" alt="The massive buttress trunk of the Mutunguruni Tree in Tharaka Nithi">
             <span class="excursion-tag">12 MINS DRIVE</span>
           </div>
           <div class="excursion-body">
@@ -509,7 +515,7 @@
         <!-- Gem 3: Tea Hill Trails -->
         <div class="excursion-card">
           <div class="excursion-img-wrap">
-            <img src="assets/tea-hills.png" alt="Morning walks through rolling emerald tea fields">
+            <img loading="lazy" src="assets/tea-hills.webp" alt="Morning walks through rolling emerald tea fields">
             <span class="excursion-tag">AT YOUR DOORSTEP</span>
           </div>
           <div class="excursion-body">
@@ -675,7 +681,7 @@
         </div>
 
         <div class="img-frame">
-          <img src="assets/outside-lawn.jpg" alt="Lush outside lawn and countryside landscape surrounding The STER Farmhouse">
+          <img loading="lazy" src="assets/outside-lawn.webp" alt="Lush outside lawn and countryside landscape surrounding The STER Farmhouse">
         </div>
       </div>
     </div>
@@ -770,12 +776,12 @@
       </div>
 
       <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 14px; margin-top: 36px;" data-reveal>
-        <div class="img-frame" style="aspect-ratio: 1;"><img src="assets/tea-hills.png" alt="Tea estates" style="aspect-ratio:1; object-fit:cover;"></div>
-        <div class="img-frame" style="aspect-ratio: 1;"><img src="assets/ngoko-waterfall.jpg" alt="Ngoko waterfall" style="aspect-ratio:1; object-fit:cover;"></div>
-        <div class="img-frame" style="aspect-ratio: 1;"><img src="assets/mutunguruni-tree.png" alt="Mutunguruni giant tree" style="aspect-ratio:1; object-fit:cover;"></div>
-        <div class="img-frame" style="aspect-ratio: 1;"><img src="assets/living-room-main.jpg" alt="Living room" style="aspect-ratio:1; object-fit:cover;"></div>
-        <div class="img-frame" style="aspect-ratio: 1;"><img src="assets/scenic-window.jpg" alt="Scenic window view" style="aspect-ratio:1; object-fit:cover;"></div>
-        <div class="img-frame" style="aspect-ratio: 1;"><img src="assets/outside-grounds.jpg" alt="Farmhouse exterior" style="aspect-ratio:1; object-fit:cover;"></div>
+        <div class="img-frame" style="aspect-ratio: 1;"><img loading="lazy" src="assets/tea-hills.webp" alt="Tea estates" style="aspect-ratio:1; object-fit:cover;"></div>
+        <div class="img-frame" style="aspect-ratio: 1;"><img loading="lazy" src="assets/ngoko-waterfall.webp" alt="Ngoko waterfall" style="aspect-ratio:1; object-fit:cover;"></div>
+        <div class="img-frame" style="aspect-ratio: 1;"><img loading="lazy" src="assets/mutunguruni-tree.webp" alt="Mutunguruni giant tree" style="aspect-ratio:1; object-fit:cover;"></div>
+        <div class="img-frame" style="aspect-ratio: 1;"><img loading="lazy" src="assets/living-room-main.webp" alt="Living room" style="aspect-ratio:1; object-fit:cover;"></div>
+        <div class="img-frame" style="aspect-ratio: 1;"><img loading="lazy" src="assets/scenic-window.webp" alt="Scenic window view" style="aspect-ratio:1; object-fit:cover;"></div>
+        <div class="img-frame" style="aspect-ratio: 1;"><img loading="lazy" src="assets/outside-grounds.webp" alt="Farmhouse exterior" style="aspect-ratio:1; object-fit:cover;"></div>
       </div>
     </div>
   </section>
@@ -843,6 +849,21 @@
       From <span>KES 15,000</span> / night
     </div>
     <a href="#book" class="mobile-reserve-link">Reserve</a>
+  </div>
+
+    <!-- ================== FULL-SCREEN PHOTO LIGHTBOX ================== -->
+  <div id="lightboxModal" class="lightbox-modal" aria-hidden="true" role="dialog">
+    <button type="button" class="lightbox-close" id="lightboxCloseBtn" aria-label="Close photo">&times;</button>
+    <button type="button" class="lightbox-nav prev" id="lightboxPrevBtn" aria-label="Previous photo">&#8249;</button>
+    <button type="button" class="lightbox-nav next" id="lightboxNextBtn" aria-label="Next photo">&#8250;</button>
+    
+    <div class="lightbox-content">
+      <img id="lightboxImg" src="" alt="The STER Farmhouse photo" class="lightbox-image">
+      <div class="lightbox-caption-bar">
+        <span id="lightboxCaption" class="lightbox-caption">Photo Title</span>
+        <span id="lightboxCounter" class="lightbox-counter">1 / 1</span>
+      </div>
+    </div>
   </div>
 
   <script src="app.js"></script>
