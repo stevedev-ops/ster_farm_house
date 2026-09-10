@@ -12,7 +12,7 @@ export default async function handler(req, res) {
     return res.status(200).end();
   }
 
-  const ADMIN_PIN = process.env.ADMIN_PIN || '2540';
+  const ADMIN_PIN = String(process.env.ADMIN_PIN || '2540').trim();
   const GITHUB_TOKEN = process.env.GITHUB_TOKEN;
   const GITHUB_REPO = process.env.GITHUB_REPO || 'stevedev-ops/ster_farm_house';
   const KV_URL = process.env.KV_REST_API_URL;
@@ -68,14 +68,21 @@ export default async function handler(req, res) {
   // 2. POST: Update booked dates (Requires PIN)
   if (req.method === 'POST') {
     try {
-      const pin = req.headers['x-admin-pin'] || (req.body && req.body.pin);
+      let bodyData = req.body;
+      if (typeof bodyData === 'string') {
+        try { bodyData = JSON.parse(bodyData); } catch (e) {}
+      }
+
+      let pin = req.headers['x-admin-pin'] || (bodyData && bodyData.pin);
+      pin = String(pin || '').trim();
+
       if (pin !== ADMIN_PIN) {
         return res.status(401).json({ error: 'Unauthorized: Invalid Admin PIN' });
       }
 
-      const dates = req.body && Array.isArray(req.body.dates) ? req.body.dates : [];
+      const rawDates = bodyData && Array.isArray(bodyData.dates) ? bodyData.dates : [];
       // Clean and sort dates
-      const uniqueSortedDates = Array.from(new Set(dates)).sort();
+      const uniqueSortedDates = Array.from(new Set(rawDates)).sort();
 
       let savedSource = 'local_file';
 
