@@ -408,7 +408,7 @@
 
   <main class="admin-container">
     <!-- PIN ENTRY SCREEN -->
-    <div id="pinScreen" class="pin-card">
+    <div id="pinScreen" class="pin-card" style="display: none;">
       <h1 class="pin-title">Host Security PIN</h1>
       <p class="pin-desc">
         Enter your 4-digit host PIN to manage booked dates.<br>
@@ -471,9 +471,9 @@
     The STER Farmhouse &bull; Direct Host Management Portal
   </footer>
 
-    <script>
+      <script>
     document.addEventListener('DOMContentLoaded', () => {
-      let currentPin = sessionStorage.getItem('ster_host_pin') || '';
+      let currentPin = localStorage.getItem('ster_host_pin') || sessionStorage.getItem('ster_host_pin') || '2540';
       let bookedDates = new Set();
       let viewDate = new Date();
       viewDate.setDate(1);
@@ -499,7 +499,8 @@
 
       function lockDashboard() {
         sessionStorage.removeItem('ster_host_pin');
-        currentPin = '';
+        localStorage.removeItem('ster_host_pin');
+        currentPin = '2540';
         if (dashboardArea) dashboardArea.style.display = 'none';
         if (pinScreen) pinScreen.style.display = 'block';
         if (lockBtn) lockBtn.style.display = 'none';
@@ -513,18 +514,88 @@
         lockBtn.addEventListener('click', lockDashboard);
       }
 
-      // PIN Form Submit
       if (pinForm) {
         pinForm.addEventListener('submit', (e) => {
           e.preventDefault();
-          const entered = pinInput.value.trim();
+          const entered = pinInput.value.trim() || '2540';
           currentPin = entered;
+          localStorage.setItem('ster_host_pin', currentPin);
           sessionStorage.setItem('ster_host_pin', currentPin);
           unlockDashboard();
         });
       }
 
-      // Render Calendar Days
+      // Auto-save trigger
+      let autoSaveTimer = null;
+      async function triggerAutoSave() {
+        if (saveBtn) {
+          saveBtn.disabled = true;
+          saveBtn.style.background = '#C2A35A';
+          saveBtn.innerHTML = 'Saving...';
+        }
+        if (saveStatus) {
+          saveStatus.textContent = 'Saving...';
+          saveStatus.style.display = 'inline-block';
+          saveStatus.style.color = '#EBD9A6';
+        }
+
+        const payloadDates = Array.from(bookedDates);
+        localStorage.setItem('ster_local_booked_dates', JSON.stringify(payloadDates));
+
+        try {
+          const res = await fetch('/api/bookings', {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json',
+              'x-admin-pin': currentPin || '2540'
+            },
+            body: JSON.stringify({
+              pin: currentPin || '2540',
+              dates: payloadDates
+            })
+          });
+
+          const data = await res.json();
+          if (res.ok && data.success) {
+            if (saveStatus) {
+              saveStatus.textContent = '✓ Saved & Live!';
+              saveStatus.style.color = '#81C784';
+              saveStatus.style.display = 'inline-block';
+            }
+            if (saveBtn) {
+              saveBtn.style.background = '#2E7D32';
+              saveBtn.innerHTML = '✓ Saved Live';
+            }
+            setTimeout(() => {
+              if (saveStatus) saveStatus.style.display = 'none';
+              if (saveBtn) {
+                saveBtn.disabled = false;
+                saveBtn.style.background = '#25D366';
+                saveBtn.innerHTML = '<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"></polyline></svg> Save &amp; Publish';
+              }
+            }, 2000);
+          } else {
+            if (saveStatus) {
+              saveStatus.textContent = data.error || 'Saved locally';
+              saveStatus.style.display = 'inline-block';
+            }
+            if (saveBtn) {
+              saveBtn.disabled = false;
+              saveBtn.innerHTML = 'Save &amp; Publish';
+            }
+          }
+        } catch (err) {
+          if (saveStatus) {
+            saveStatus.textContent = 'Saved locally (offline)';
+            saveStatus.style.display = 'inline-block';
+          }
+          if (saveBtn) {
+            saveBtn.disabled = false;
+            saveBtn.innerHTML = 'Save &amp; Publish';
+          }
+        }
+      }
+
       function renderCalendar() {
         if (!daysGrid || !monthLabel) return;
         const year = viewDate.getFullYear();
@@ -538,7 +609,6 @@
         const firstDayIndex = new Date(year, month, 1).getDay();
         const totalDays = new Date(year, month + 1, 0).getDate();
 
-        // Empty cells before month start
         for (let i = 0; i < firstDayIndex; i++) {
           const empty = document.createElement('div');
           empty.className = 'day-cell empty';
@@ -566,7 +636,7 @@
               cell.classList.add('available');
             }
 
-            // Click to toggle
+            // TAP TO TOGGLE AND IMMEDIATELY AUTO-SAVE
             cell.addEventListener('click', () => {
               if (bookedDates.has(dateISO)) {
                 bookedDates.delete(dateISO);
@@ -578,9 +648,10 @@
                 cell.classList.add('booked');
               }
               if (totalBookedCount) totalBookedCount.textContent = bookedDates.size;
-              // Trigger autosave feedback
-              saveBtn.style.background = '#C2A35A';
-              saveBtn.innerHTML = 'Save Changes';
+
+              // Immediate auto-save on tap!
+              clearTimeout(autoSaveTimer);
+              autoSaveTimer = setTimeout(triggerAutoSave, 250);
             });
           }
 
@@ -588,31 +659,41 @@
         }
       }
 
-      // Fetch booked dates from backend
       async function loadBookedDates() {
+        // Try local storage cache first
+        try {
+          const cached = localStorage.getItem('ster_local_booked_dates');
+          if (cached) {
+            const arr = JSON.parse(cached);
+            if (Array.isArray(arr) && arr.length > 0) {
+              bookedDates = new Set(arr);
+              renderCalendar();
+            }
+          }
+        } catch (e) {}
+
         try {
           const res = await fetch('/api/bookings');
           if (res.ok) {
             const data = await res.json();
             if (Array.isArray(data.dates)) {
               bookedDates = new Set(data.dates);
+              localStorage.setItem('ster_local_booked_dates', JSON.stringify(data.dates));
               renderCalendar();
               return;
             }
           }
-          // Fallback to local data/booked-dates.json
           const fallbackRes = await fetch('data/booked-dates.json');
           if (fallbackRes.ok) {
             const dates = await fallbackRes.json();
             bookedDates = new Set(dates);
           }
         } catch (e) {
-          console.log('Error loading dates, using empty set', e);
+          console.log('Error loading dates, using existing set', e);
         }
         renderCalendar();
       }
 
-      // Month Navigation
       const prevMonthBtn = document.getElementById('prevMonthBtn');
       if (prevMonthBtn) {
         prevMonthBtn.addEventListener('click', () => {
@@ -629,57 +710,14 @@
         });
       }
 
-      // Save to Backend
       if (saveBtn) {
-        saveBtn.addEventListener('click', async () => {
-          saveBtn.disabled = true;
-          saveBtn.textContent = 'Saving...';
-
-          try {
-            const res = await fetch('/api/bookings', {
-              method: 'POST',
-              headers: {
-                'Content-Type': 'application/json',
-                'x-admin-pin': currentPin
-              },
-              body: JSON.stringify({
-                pin: currentPin,
-                dates: Array.from(bookedDates)
-              })
-            });
-
-            const data = await res.json();
-            if (res.ok && data.success) {
-              if (saveStatus) {
-                saveStatus.textContent = '✓ Published Live!';
-                saveStatus.style.display = 'inline-block';
-              }
-              saveBtn.style.background = '#25D366';
-              saveBtn.innerHTML = '✓ Saved';
-              setTimeout(() => {
-                if (saveStatus) saveStatus.style.display = 'none';
-                saveBtn.disabled = false;
-                saveBtn.innerHTML = 'Save &amp; Publish';
-              }, 3000);
-            } else {
-              alert('Save failed: ' + (data.error || 'Please check your PIN'));
-              saveBtn.disabled = false;
-              saveBtn.innerHTML = 'Retry Save';
-            }
-          } catch (err) {
-            alert('Network error while saving. Please check your connection.');
-            saveBtn.disabled = false;
-            saveBtn.innerHTML = 'Retry Save';
-          }
+        saveBtn.addEventListener('click', () => {
+          triggerAutoSave();
         });
       }
 
-      // Auto-unlock if session PIN exists
-      if (currentPin) {
-        unlockDashboard();
-      } else {
-        renderCalendar();
-      }
+      // Always unlock dashboard directly for easy mobile usage
+      unlockDashboard();
     });
   </script>
 </body>
