@@ -577,6 +577,35 @@
             </div>
 
             <!-- Host Admin Portal Quick Link in Booking Header -->
+            <!-- Interactive Availability Calendar (Non-clickable Booked Dates) -->
+            <div class="guest-cal-card">
+              <div class="guest-cal-header">
+                <div>
+                  <span class="guest-cal-title">Availability &amp; Direct Booking</span>
+                  <p class="guest-cal-subtitle">Reserved dates are non-clickable. Tap open dates to select check-in and check-out.</p>
+                </div>
+                <div class="guest-cal-nav">
+                  <button type="button" id="guestCalPrev" class="cal-nav-btn" aria-label="Previous Month">&#8249;</button>
+                  <span id="guestCalMonthLabel" class="cal-month-label">September 2026</span>
+                  <button type="button" id="guestCalNext" class="cal-nav-btn" aria-label="Next Month">&#8250;</button>
+                </div>
+              </div>
+
+              <div class="guest-weekdays-grid">
+                <span>SU</span><span>MO</span><span>TU</span><span>WE</span><span>TH</span><span>FR</span><span>SA</span>
+              </div>
+
+              <div id="guestDaysGrid" class="guest-days-grid">
+                <!-- Dynamically rendered days -->
+              </div>
+
+              <div class="guest-cal-legend">
+                <div class="legend-item"><span class="legend-swatch avail"></span> Available</div>
+                <div class="legend-item"><span class="legend-swatch selected"></span> Selected Stay</div>
+                <div class="legend-item"><span class="legend-swatch booked"></span> Reserved (Not Pickable)</div>
+              </div>
+            </div>
+
             <div class="form-row">
               <div class="form-group">
                 <label class="form-label" for="calcCheckIn">Check-In Date</label>

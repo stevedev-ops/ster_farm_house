@@ -2042,3 +2042,218 @@ details[open] .faq-toggle-icon {
     gap: 6px !important;
   }
 }
+
+/* ================== GUEST AVAILABILITY CALENDAR (NON-PICKABLE RESERVED DATES) ================== */
+.guest-cal-card {
+  background: rgba(20, 26, 19, 0.92);
+  border: 1px solid var(--gold-border);
+  border-radius: 8px;
+  padding: 18px 16px;
+  margin-bottom: 20px;
+}
+
+.guest-cal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.guest-cal-title {
+  font-family: var(--font-serif);
+  font-size: 18px;
+  color: var(--text-white);
+  letter-spacing: 0.04em;
+  display: block;
+}
+
+.guest-cal-subtitle {
+  font-family: var(--font-mono);
+  font-size: 11px;
+  color: var(--text-muted);
+  letter-spacing: 0.04em;
+  margin-top: 2px;
+}
+
+.guest-cal-nav {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.cal-nav-btn {
+  background: rgba(28, 35, 27, 0.9);
+  border: 1px solid var(--gold-border);
+  color: var(--gold-light);
+  border-radius: 4px;
+  width: 28px;
+  height: 28px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 16px;
+  transition: all 0.2s ease;
+}
+
+.cal-nav-btn:hover {
+  border-color: var(--gold-primary);
+  color: var(--text-white);
+  background: rgba(40, 50, 38, 0.9);
+}
+
+.cal-month-label {
+  font-family: var(--font-serif);
+  font-size: 15px;
+  color: var(--gold-light);
+  min-width: 130px;
+  text-align: center;
+}
+
+.guest-weekdays-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: 10px;
+  letter-spacing: 0.14em;
+  color: var(--gold-light);
+  padding-bottom: 6px;
+  margin-bottom: 6px;
+  border-bottom: 1px solid rgba(194, 163, 90, 0.15);
+}
+
+.guest-days-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 5px;
+}
+
+.guest-day-cell {
+  min-height: 44px;
+  aspect-ratio: 1;
+  border-radius: 4px;
+  border: 1px solid rgba(248, 245, 238, 0.1);
+  background: rgba(28, 35, 27, 0.6);
+  color: var(--text-white);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  cursor: pointer;
+  transition: all 0.15s ease;
+  position: relative;
+  user-select: none;
+  padding: 2px;
+}
+
+.guest-day-cell:hover:not(.disabled):not(.booked) {
+  border-color: var(--gold-primary);
+  background: rgba(194, 163, 90, 0.2);
+  transform: translateY(-1px);
+}
+
+.guest-day-cell.empty {
+  background: transparent;
+  border-color: transparent;
+  cursor: default;
+}
+
+/* RESERVED - NON CLICKABLE & NOT PICKABLE */
+.guest-day-cell.booked,
+.guest-day-cell.disabled {
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+  background: rgba(184, 58, 58, 0.16) !important;
+  border-color: rgba(184, 58, 58, 0.35) !important;
+  color: #FFA5A5 !important;
+  opacity: 0.42;
+  text-decoration: line-through;
+}
+
+.guest-day-cell.booked .day-sub-label {
+  font-size: 7.5px;
+  letter-spacing: 0.08em;
+  color: #FFA5A5;
+  text-decoration: none;
+  margin-top: 1px;
+}
+
+.guest-day-cell.past {
+  opacity: 0.22 !important;
+  pointer-events: none !important;
+  cursor: not-allowed !important;
+}
+
+/* SELECTED RANGE */
+.guest-day-cell.selected-start,
+.guest-day-cell.selected-end {
+  background: var(--gold-primary) !important;
+  color: var(--forest-deep) !important;
+  font-weight: 600;
+  border-color: var(--gold-light) !important;
+}
+
+.guest-day-cell.selected-between {
+  background: rgba(194, 163, 90, 0.25) !important;
+  border-color: rgba(194, 163, 90, 0.4) !important;
+  color: var(--gold-light);
+}
+
+/* LEGEND */
+.guest-cal-legend {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+  margin-top: 12px;
+  padding-top: 10px;
+  border-top: 1px solid rgba(248, 245, 238, 0.08);
+  flex-wrap: wrap;
+}
+
+.legend-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-family: var(--font-mono);
+  font-size: 10.5px;
+  color: var(--text-muted);
+}
+
+.legend-swatch {
+  width: 10px;
+  height: 10px;
+  border-radius: 2px;
+}
+
+.legend-swatch.avail {
+  background: rgba(28, 35, 27, 0.9);
+  border: 1px solid var(--gold-border);
+}
+
+.legend-swatch.selected {
+  background: var(--gold-primary);
+}
+
+.legend-swatch.booked {
+  background: rgba(184, 58, 58, 0.6);
+  border: 1px solid #B83A3A;
+}
+
+@media (max-width: 640px) {
+  .guest-cal-card {
+    padding: 14px 10px;
+    margin-bottom: 16px;
+  }
+  .guest-day-cell {
+    min-height: 40px;
+    font-size: 11.5px;
+  }
+  .guest-days-grid {
+    gap: 3px;
+  }
+}

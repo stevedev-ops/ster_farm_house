@@ -139,6 +139,133 @@ document.addEventListener('DOMContentLoaded', () => {
     }
   };
 
+  
+  // ================== GUEST AVAILABILITY CALENDAR & STRICT DATE VALIDATION ==================
+  let guestCalViewDate = new Date();
+  guestCalViewDate.setDate(1);
+
+  const guestCalMonthLabel = document.getElementById('guestCalMonthLabel');
+  const guestDaysGrid = document.getElementById('guestDaysGrid');
+  const guestCalPrev = document.getElementById('guestCalPrev');
+  const guestCalNext = document.getElementById('guestCalNext');
+
+  const renderGuestCalendar = () => {
+    if (!guestDaysGrid || !guestCalMonthLabel) return;
+    const year = guestCalViewDate.getFullYear();
+    const month = guestCalViewDate.getMonth();
+
+    guestCalMonthLabel.textContent = guestCalViewDate.toLocaleDateString('en-GB', { month: 'long', year: 'numeric' });
+    guestDaysGrid.innerHTML = '';
+
+    const firstDayIndex = new Date(year, month, 1).getDay();
+    const totalDays = new Date(year, month + 1, 0).getDate();
+
+    // Empty lead cells
+    for (let i = 0; i < firstDayIndex; i++) {
+      const empty = document.createElement('div');
+      empty.className = 'guest-day-cell empty';
+      guestDaysGrid.appendChild(empty);
+    }
+
+    const todayDate = new Date();
+    todayDate.setHours(0, 0, 0, 0);
+
+    const checkInISO = formatDateISO(checkInDate);
+    const checkOutISO = formatDateISO(checkOutDate);
+
+    for (let day = 1; day <= totalDays; day++) {
+      const dateObj = new Date(year, month, day);
+      const dateISO = `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
+
+      const cell = document.createElement('button');
+      cell.type = 'button';
+      cell.className = 'guest-day-cell';
+
+      const isBooked = globalBookedDates.has(dateISO);
+      const isPast = dateObj < todayDate;
+
+      if (isPast) {
+        cell.classList.add('past');
+        cell.disabled = true;
+        cell.setAttribute('aria-disabled', 'true');
+        cell.innerHTML = `<span>${day}</span>`;
+      } else if (isBooked) {
+        // STRICTLY NON-CLICKABLE & NOT PICKABLE
+        cell.classList.add('booked', 'disabled');
+        cell.disabled = true;
+        cell.setAttribute('aria-disabled', 'true');
+        cell.setAttribute('title', 'Reserved — Non-pickable');
+        cell.innerHTML = `<span>${day}</span><span class="day-sub-label">BOOKED</span>`;
+      } else {
+        cell.innerHTML = `<span>${day}</span>`;
+
+        // Highlight selected range
+        if (dateISO === checkInISO) {
+          cell.classList.add('selected-start');
+          cell.innerHTML += '<span class="day-sub-label" style="color:#141A13;font-weight:600;">IN</span>';
+        } else if (dateISO === checkOutISO) {
+          cell.classList.add('selected-end');
+          cell.innerHTML += '<span class="day-sub-label" style="color:#141A13;font-weight:600;">OUT</span>';
+        } else if (dateObj > checkInDate && dateObj < checkOutDate) {
+          cell.classList.add('selected-between');
+        }
+
+        // Tap open date to set Check-In or Check-Out
+        cell.addEventListener('click', () => {
+          handleGuestDatePick(dateObj);
+        });
+      }
+
+      guestDaysGrid.appendChild(cell);
+    }
+  };
+
+  let isPickingCheckOut = false;
+  const handleGuestDatePick = (dateObj) => {
+    const iso = formatDateISO(dateObj);
+    if (globalBookedDates.has(iso)) {
+      alert('This date is reserved and cannot be picked.');
+      return;
+    }
+
+    if (!isPickingCheckOut || dateObj <= checkInDate) {
+      // Pick check-in
+      checkInDate = dateObj;
+      const nextDay = new Date(checkInDate);
+      nextDay.setDate(nextDay.getDate() + 1);
+      if (checkOutDate <= checkInDate) {
+        checkOutDate = nextDay;
+      }
+      isPickingCheckOut = true;
+    } else {
+      // Verify no booked dates in range
+      const conflicts = checkDateConflicts(checkInDate, dateObj);
+      if (conflicts.length > 0) {
+        alert('Your stay cannot span over already reserved dates (' + conflicts.join(', ') + '). Please pick an earlier check-out date.');
+        return;
+      }
+      checkOutDate = dateObj;
+      isPickingCheckOut = false;
+    }
+
+    updateCalculations();
+    renderGuestCalendar();
+  };
+
+  if (guestCalPrev) {
+    guestCalPrev.addEventListener('click', () => {
+      guestCalViewDate.setMonth(guestCalViewDate.getMonth() - 1);
+      renderGuestCalendar();
+    });
+  }
+
+  if (guestCalNext) {
+    guestCalNext.addEventListener('click', () => {
+      guestCalViewDate.setMonth(guestCalViewDate.getMonth() + 1);
+      renderGuestCalendar();
+    });
+  }
+
   const updateCalculations = () => {
     const diffTime = checkOutDate.getTime() - checkInDate.getTime();
     let nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
@@ -201,6 +328,7 @@ document.addEventListener('DOMContentLoaded', () => {
     if (rateBreakdownSpan) rateBreakdownSpan.textContent = `KES ${PRICE_PER_NIGHT.toLocaleString()} × ${nights}`;
     if (subtotalSpan) subtotalSpan.textContent = `KES ${baseStayTotal.toLocaleString()}`;
     if (depositSpan) depositSpan.textContent = `KES ${deposit.toLocaleString()} (50%)`;
+    renderGuestCalendar();
     if (totalSpan) totalSpan.textContent = `KES ${grandTotal.toLocaleString()}`;
 
     // Update WhatsApp pre-filled message
@@ -235,10 +363,18 @@ ${notes ? notes + '\n' : ''}${hasConflicts ? "[NOTE: Requested dates include nig
   if (addonAvocadoBox) addonAvocadoBox.addEventListener('change', updateCalculations);
 
   // Sync inputs
+  
+  // Strict validation on manual input changes
   if (checkInInput) {
     checkInInput.min = formatDateISO(today);
     checkInInput.addEventListener('change', (e) => {
       const selected = new Date(e.target.value + 'T00:00:00');
+      const iso = formatDateISO(selected);
+      if (globalBookedDates.has(iso)) {
+        alert(`${formatDateLabel(selected)} is already reserved and not pickable. Please choose an available date.`);
+        checkInInput.value = formatDateISO(checkInDate);
+        return;
+      }
       if (!isNaN(selected.getTime())) {
         checkInDate = selected;
         if (checkOutDate <= checkInDate) {
@@ -246,6 +382,7 @@ ${notes ? notes + '\n' : ''}${hasConflicts ? "[NOTE: Requested dates include nig
           checkOutDate.setDate(checkOutDate.getDate() + 1);
         }
         updateCalculations();
+        renderGuestCalendar();
       }
     });
   }
@@ -255,16 +392,24 @@ ${notes ? notes + '\n' : ''}${hasConflicts ? "[NOTE: Requested dates include nig
     checkOutInput.addEventListener('change', (e) => {
       const selected = new Date(e.target.value + 'T00:00:00');
       if (!isNaN(selected.getTime())) {
-        if (selected > checkInDate) {
-          checkOutDate = selected;
-          updateCalculations();
-        } else {
+        if (selected <= checkInDate) {
           alert('Check-out date must be after check-in date.');
           checkOutInput.value = formatDateISO(checkOutDate);
+          return;
         }
+        const conflicts = checkDateConflicts(checkInDate, selected);
+        if (conflicts.length > 0) {
+          alert(`Your selection covers reserved dates (${conflicts.join(', ')}). Reserved dates are not pickable.`);
+          checkOutInput.value = formatDateISO(checkOutDate);
+          return;
+        }
+        checkOutDate = selected;
+        updateCalculations();
+        renderGuestCalendar();
       }
     });
   }
+
 
   if (heroGuestsSelect) {
     heroGuestsSelect.addEventListener('change', (e) => {
