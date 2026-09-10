@@ -78,13 +78,48 @@ document.addEventListener('DOMContentLoaded', () => {
   const totalSpan = document.getElementById('totalVal');
   const whatsappBookBtn = document.getElementById('whatsappBookBtn');
 
+  const CHEF_PRICE_PER_DAY = 3000;
+  const AVOCADO_TOUR_PER_PERSON = 1000;
+
+  const addonChefBox = document.getElementById('addonChef');
+  const addonAvocadoBox = document.getElementById('addonAvocado');
+  const addonChefLine = document.getElementById('addonChefLine');
+  const addonChefVal = document.getElementById('addonChefVal');
+  const addonAvocadoLine = document.getElementById('addonAvocadoLine');
+  const addonAvocadoLabel = document.getElementById('addonAvocadoLabel');
+  const addonAvocadoVal = document.getElementById('addonAvocadoVal');
+
   const updateCalculations = () => {
     const diffTime = checkOutDate.getTime() - checkInDate.getTime();
     let nights = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
     if (nights < 1) nights = 1;
 
-    const total = nights * PRICE_PER_NIGHT;
-    const deposit = Math.round(total * 0.5);
+    const baseStayTotal = nights * PRICE_PER_NIGHT;
+    
+    // Calculate Add-Ons
+    let chefTotal = 0;
+    const isChefSelected = addonChefBox && addonChefBox.checked;
+    if (isChefSelected) {
+      chefTotal = nights * CHEF_PRICE_PER_DAY;
+      if (addonChefLine) addonChefLine.style.display = 'flex';
+      if (addonChefVal) addonChefVal.textContent = `+ KES ${chefTotal.toLocaleString()} (${nights}d)`;
+    } else {
+      if (addonChefLine) addonChefLine.style.display = 'none';
+    }
+
+    let avocadoTotal = 0;
+    const isAvocadoSelected = addonAvocadoBox && addonAvocadoBox.checked;
+    if (isAvocadoSelected) {
+      avocadoTotal = guestsCount * AVOCADO_TOUR_PER_PERSON;
+      if (addonAvocadoLine) addonAvocadoLine.style.display = 'flex';
+      if (addonAvocadoLabel) addonAvocadoLabel.textContent = `Avocado Farm Tour (${guestsCount} guests)`;
+      if (addonAvocadoVal) addonAvocadoVal.textContent = `+ KES ${avocadoTotal.toLocaleString()}`;
+    } else {
+      if (addonAvocadoLine) addonAvocadoLine.style.display = 'none';
+    }
+
+    const grandTotal = baseStayTotal + chefTotal + avocadoTotal;
+    const deposit = Math.round(grandTotal * 0.5);
 
     // Update labels
     if (checkInHeroLabel) checkInHeroLabel.textContent = formatDateLabel(checkInDate);
@@ -95,9 +130,9 @@ document.addEventListener('DOMContentLoaded', () => {
 
     if (nightsCountSpan) nightsCountSpan.textContent = `${nights} night${nights > 1 ? 's' : ''}`;
     if (rateBreakdownSpan) rateBreakdownSpan.textContent = `KES ${PRICE_PER_NIGHT.toLocaleString()} × ${nights}`;
-    if (subtotalSpan) subtotalSpan.textContent = `KES ${total.toLocaleString()}`;
+    if (subtotalSpan) subtotalSpan.textContent = `KES ${baseStayTotal.toLocaleString()}`;
     if (depositSpan) depositSpan.textContent = `KES ${deposit.toLocaleString()} (50%)`;
-    if (totalSpan) totalSpan.textContent = `KES ${total.toLocaleString()}`;
+    if (totalSpan) totalSpan.textContent = `KES ${grandTotal.toLocaleString()}`;
 
     // Update WhatsApp pre-filled message
     const guestNameInput = document.getElementById('guestName');
@@ -106,11 +141,19 @@ document.addEventListener('DOMContentLoaded', () => {
     const guestName = guestNameInput && guestNameInput.value ? guestNameInput.value.trim() : 'Guest';
     const notes = specialReqInput && specialReqInput.value ? `Special notes: ${specialReqInput.value.trim()}` : '';
 
+    let addonsText = '';
+    if (isChefSelected || isAvocadoSelected) {
+      addonsText = '\n- Add-Ons:';
+      if (isChefSelected) addonsText += `\n  • Private Chef (${nights} days @ KES 3,000/day = KES ${chefTotal.toLocaleString()})`;
+      if (isAvocadoSelected) addonsText += `\n  • STER Avocado Farm Tour (${guestsCount} guests @ KES 1,000 = KES ${avocadoTotal.toLocaleString()})`;
+    }
+
     const message = `Hello STER Farmhouse! I would like to request a reservation:
 - Guest Name: ${guestName}
 - Dates: ${formatDateLabel(checkInDate)} to ${formatDateLabel(checkOutDate)} (${nights} night${nights > 1 ? 's' : ''})
 - Guests: ${guestsCount} guests
-- Total: KES ${total.toLocaleString()} (50% deposit: KES ${deposit.toLocaleString()})
+- Accommodation: Entire Home (KES ${baseStayTotal.toLocaleString()})${addonsText}
+- Estimated Total: KES ${grandTotal.toLocaleString()} (50% deposit: KES ${deposit.toLocaleString()})
 ${notes ? notes + '\n' : ''}Please confirm date availability!`;
 
     const encodedMsg = encodeURIComponent(message);
@@ -118,6 +161,9 @@ ${notes ? notes + '\n' : ''}Please confirm date availability!`;
       whatsappBookBtn.href = `https://wa.me/${WHATSAPP_NUMBER}?text=${encodedMsg}`;
     }
   };
+
+  if (addonChefBox) addonChefBox.addEventListener('change', updateCalculations);
+  if (addonAvocadoBox) addonAvocadoBox.addEventListener('change', updateCalculations);
 
   // Sync inputs
   if (checkInInput) {

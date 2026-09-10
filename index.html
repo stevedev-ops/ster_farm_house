@@ -338,7 +338,7 @@
           <svg class="amenity-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="9" cy="7" r="4"></circle><path d="M23 21v-2a4 4 0 0 0-3-3.87"></path><path d="M16 3.13a4 4 0 0 1 0 7.75"></path></svg>
           <div>
             <h4 class="amenity-title">Personal Chef Option</h4>
-            <p class="amenity-text">Delicious freshly cooked culinary service available upon advance reservation.</p>
+            <p class="amenity-text">Delicious freshly cooked culinary service available at KES 3,000 / day upon advance reservation.</p>
           </div>
         </div>
       </div>
@@ -604,6 +604,30 @@
               </div>
             </div>
 
+                        <!-- Optional Add-Ons -->
+            <div class="form-group" style="margin-top: 4px;">
+              <span class="form-label" style="margin-bottom: 10px; display: block;">EXPERIENCE ADD-ONS</span>
+              <div class="addons-grid">
+                <label class="addon-card" for="addonChef">
+                  <input type="checkbox" id="addonChef" class="addon-checkbox">
+                  <div class="addon-text">
+                    <span class="addon-title">Private Chef Service</span>
+                    <span class="addon-desc">Freshly prepared breakfast, lunch &amp; dinner</span>
+                  </div>
+                  <span class="addon-rate">+ KES 3,000 / day</span>
+                </label>
+
+                <label class="addon-card" for="addonAvocado">
+                  <input type="checkbox" id="addonAvocado" class="addon-checkbox">
+                  <div class="addon-text">
+                    <span class="addon-title">STER Avocado Farm Tour</span>
+                    <span class="addon-desc">Guided tour of orchards, beehives &amp; stream</span>
+                  </div>
+                  <span class="addon-rate">+ KES 1,000 / person</span>
+                </label>
+              </div>
+            </div>
+
             <div class="form-group">
               <label class="form-label" for="specialRequests">Special Requests / Notes (Optional)</label>
               <textarea id="specialRequests" class="form-textarea" rows="3" placeholder="e.g. Requesting personal chef, bonfire setup, or waterfall excursion guide..."></textarea>
@@ -630,6 +654,16 @@
               <div class="summary-line">
                 <span id="rateBreakdown">KES 15,000 &times; 2</span>
                 <span id="subtotalVal" style="color: var(--text-white);">KES 30,000</span>
+              </div>
+
+                            <div id="addonChefLine" class="summary-line" style="display: none;">
+                <span>Private Chef Service</span>
+                <span id="addonChefVal" style="color: var(--gold-light);">+ KES 3,000</span>
+              </div>
+
+              <div id="addonAvocadoLine" class="summary-line" style="display: none;">
+                <span id="addonAvocadoLabel">Avocado Farm Tour</span>
+                <span id="addonAvocadoVal" style="color: var(--gold-light);">+ KES 4,000</span>
               </div>
 
               <div class="summary-line">

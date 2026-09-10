@@ -1654,3 +1654,79 @@ details[open] .faq-toggle-icon {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.4);
   flex: none;
 }
+
+
+/* ================== EXPERIENCE ADD-ONS STYLES ================== */
+.addons-grid {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.addon-card {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  background: rgba(22, 28, 21, 0.75);
+  border: 1px solid rgba(248, 245, 238, 0.18);
+  border-radius: 6px;
+  padding: 12px 16px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  user-select: none;
+}
+
+.addon-card:hover {
+  border-color: var(--gold-primary);
+  background: rgba(30, 38, 29, 0.85);
+}
+
+.addon-checkbox {
+  width: 18px;
+  height: 18px;
+  accent-color: var(--gold-primary);
+  cursor: pointer;
+  flex: none;
+}
+
+.addon-text {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.addon-title {
+  font-family: var(--font-mono);
+  font-size: 12.5px;
+  color: var(--text-white);
+  font-weight: 500;
+  letter-spacing: 0.04em;
+}
+
+.addon-desc {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+.addon-rate {
+  font-family: var(--font-mono);
+  font-size: 12px;
+  color: var(--gold-light);
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+@media (max-width: 640px) {
+  .addon-card {
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    padding: 12px 12px;
+  }
+  .addon-rate {
+    margin-left: 32px;
+    margin-top: 4px;
+    font-size: 11px;
+  }
+}
