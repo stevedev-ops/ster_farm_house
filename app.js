@@ -38,7 +38,7 @@ document.addEventListener('DOMContentLoaded', () => {
   }
 
   // 3. Pricing Configuration
-  const PRICE_PER_NIGHT = 25000; // KES
+  const PRICE_PER_NIGHT = 15000; // KES
   const WHATSAPP_NUMBER = '254702753299'; // Default host line
 
   // 4. Booking State
